@@ -1,0 +1,52 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/image/nginx/Dockerfile
+    ports:
+      - 23380:80
+    volumes:
+      - ./:/project/php_practice:cached
+    command: "/usr/sbin/nginx -g 'daemon off;'"
+    restart: always
+    networks:
+      - php-practice-network
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/image/php-fpm/Dockerfile
+    ports:
+      - 23381:9000
+    depends_on:
+      - nginx
+      - mysql
+    volumes:
+      - ./:/project/php_practice:cached
+    networks:
+      - php-practice-network
+    command:
+      - /usr/local/sbin/php-fpm
+    restart: always
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 23382:3306
+    environment:
+      MYSQL_DATABASE: php_practice_dev
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - php-practice-network
+    volumes:
+      - ./docker/data/mysql:/var/lib/mysql:cached
+      - ./docker/config/mysql:/etc/mysql/conf.d
+    restart: always
+
+volumes:
+  mysql:
+
+networks:
+  php-practice-network:
+    external: true

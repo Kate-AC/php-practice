@@ -1,0 +1,6 @@
+[mysqld]
+lower_case_table_names=2
+explicit_defaults_for_timestamp=1
+skip_innodb_doublewrite
+innodb_flush_log_at_trx_commit=2
+innodb_buffer_pool_size=2G
